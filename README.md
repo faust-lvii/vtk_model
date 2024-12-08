@@ -29,7 +29,7 @@ python renderer.py
 
 Aşağıda, uygulamanın çalışmasını gösteren bir video bulunmaktadır:
 
-![Model Görselleştirme](mymodel.mp4)
+![Model Görselleştirme](mymodel.gif)
 
 ## Katkıda Bulunma
 
