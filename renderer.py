@@ -1,78 +1,78 @@
 import vtk
 
-# STL dosyasını yükle
+# Load STL file
 reader = vtk.vtkSTLReader()
 reader.SetFileName("model.stl")
 reader.Update()
 
-# Model boyutlarını al
+# Get model dimensions
 bounds = reader.GetOutput().GetBounds()
 size = max(bounds[1]-bounds[0], bounds[3]-bounds[2], bounds[5]-bounds[4])
 
-# Modelin merkez noktasını hesapla
+# Calculate model center point
 center_x = (bounds[0] + bounds[1]) / 2
 center_y = (bounds[2] + bounds[3]) / 2
 center_z = (bounds[4] + bounds[5]) / 2
 
-# Küp oluştur - modelden 2 kat büyük
+# Create cube - 1.2 times larger than the model
 cube = vtk.vtkCubeSource()
-cube.SetXLength(size * 1.2)  # 2'den 1.2'ye küçültüldü
-cube.SetYLength(size * 1.2)  # 2'den 1.2'ye küçültüldü
-cube.SetZLength(size * 1.2)  # 2'den 1.2'ye küçültüldü
-cube.SetCenter(center_x +0.5, center_y, center_z -4)  # Küpü modelin merkezine hizala
+cube.SetXLength(size * 1.2)  # Reduced from 2 to 1.2
+cube.SetYLength(size * 1.2)  # Reduced from 2 to 1.2
+cube.SetZLength(size * 1.2)  # Reduced from 2 to 1.2
+cube.SetCenter(center_x +0.5, center_y, center_z -4)  # Align cube to model center
 
-# Küp için mapper ve actor
+# Mapper and actor for cube
 cube_mapper = vtk.vtkPolyDataMapper()
 cube_mapper.SetInputConnection(cube.GetOutputPort())
 
 cube_actor = vtk.vtkActor()
 cube_actor.SetMapper(cube_mapper)
-cube_actor.GetProperty().SetRepresentationToWireframe()  # Tel kafes görünümü
-cube_actor.GetProperty().SetColor(1, 1, 1)  # Beyaz renk
-cube_actor.GetProperty().SetLineWidth(2)  # Çizgi kalınlığı
+cube_actor.GetProperty().SetRepresentationToWireframe()  # Wireframe view
+cube_actor.GetProperty().SetColor(1, 1, 1)  # White color
+cube_actor.GetProperty().SetLineWidth(2)  # Line width
 
-# Mapper oluştur (ana model için)
+# Create mapper (for main model)
 mapper = vtk.vtkPolyDataMapper()
 mapper.SetInputConnection(reader.GetOutputPort())
 
-# Actor oluştur (modelin sahneye eklenmesi için)
+# Create actor (to add model to scene)
 actor = vtk.vtkActor()
 actor.SetMapper(mapper)
-actor.SetPosition(-center_x, -center_y, -center_z)  # Modeli merkeze taşı
+actor.SetPosition(-center_x, -center_y, -center_z)  # Move model to center
 
-# Renderer (çizim yapan birim) oluştur
+# Create renderer (drawing unit)
 renderer = vtk.vtkRenderer()
 renderer.AddActor(actor)
-renderer.AddActor(cube_actor)  # Küpü ekle
-renderer.SetBackground(0, 0, 0)  # Arkaplan rengi (RGB)
+renderer.AddActor(cube_actor)  # Add cube
+renderer.SetBackground(0, 0, 0)  # Background color (RGB)
 
-# Render Window oluştur
+# Create render window
 render_window = vtk.vtkRenderWindow()
 render_window.AddRenderer(renderer)
-render_window.SetSize(800, 800)  # Pencere boyutu 800x800 olarak ayarlandı
+render_window.SetSize(800, 800)  # Window size set to 800x800
 
-# Render Window Interactor (etkileşim) oluştur
+# Create render window interactor
 interactor = vtk.vtkRenderWindowInteractor()
 interactor.SetRenderWindow(render_window)
 
-# Kamera ayarlarını düzenle
+# Configure camera settings
 camera = renderer.GetActiveCamera()
-camera.SetPosition(0, -30, 25)  # Kamerayı z ekseninde konumlandır
-camera.SetFocalPoint(0, 3, -1)  # Merkeze bak
-camera.SetViewUp(0, 1, 0)      # Yukarı yönü belirle
+camera.SetPosition(0, -30, 25)  # Position camera on z-axis
+camera.SetFocalPoint(0, 3, -1)  # Look at center
+camera.SetViewUp(0, 1, 0)      # Set up direction
 
-# Döndürme fonksiyonu
+# Rotation function
 def rotate_model(obj, event):
-    actor.RotateZ(1)  # Z ekseni etrafında döndür
+    actor.RotateZ(1)  # Rotate around z-axis
     render_window.Render()
 
-# Timer callback'i ekle
+# Add timer callback
 interactor.AddObserver('TimerEvent', rotate_model)
 interactor.Initialize()
 
-# Timer başlat
-timer_id = interactor.CreateRepeatingTimer(30)  # 30ms'de bir güncelle
+# Start timer
+timer_id = interactor.CreateRepeatingTimer(30)  # Update every 30ms
 
-# Görselleştirmeyi başlat
+# Start visualization
 render_window.Render()
 interactor.Start()
