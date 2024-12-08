@@ -11,9 +11,9 @@ Bu proje, VTK (Visualization Toolkit) kullanarak STL dosyalarını yükleyip gö
 
 Gerekli kütüphaneleri yüklemek için aşağıdaki komutu kullanabilirsiniz:
 
-´´´bash
+```bash
 pip install vtk
-´´´
+```
 ## Kullanım
 
 1. `model.stl` dosyasını proje dizinine yerleştirin.
